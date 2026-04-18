@@ -319,6 +319,15 @@ html,body,#root{
   .login-container,.signup-container{padding:14px}
 }
 
+@media (max-width:320px){
+    .search-input{
+    width: 100%;
+    font-size: 16px; /* prevents zoom on iOS */
+    padding: 14px;
+    height:30px;
+  }
+
+  }
 @media (max-width:520px){
 
   .search-row{
