@@ -318,3 +318,28 @@ html,body,#root{
   .container{padding:12px}
   .login-container,.signup-container{padding:14px}
 }
+
+@media (max-width:520px){
+
+  .search-row{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .search-input{
+    width: 100%;
+    font-size: 16px; /* prevents zoom on iOS */
+    padding: 14px;
+  }
+
+  .btn{
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .dropdown{
+    max-width: 100%;
+  }
+}
