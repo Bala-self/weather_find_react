@@ -22,7 +22,7 @@ function Home() {
     }
 
     const results = uniqueCities
-      .filter(city => city.toLowerCase().startsWith(value.toLowerCase()))
+      .filter((city) => city.toLowerCase().startsWith(value.toLowerCase()))
       .slice(0, 10);
 
     setFiltered(results);
@@ -36,9 +36,8 @@ function Home() {
 
     try {
       setLoading(true);
-
       const { data } = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(query)}&appid=${"dfbb4cc93665f3216cc414fd988d07fb"}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(query)}&appid=${API_KEY || "dfbb4cc93665f3216cc414fd988d07fb"}`
       );
 
       setWeather(data);
@@ -76,7 +75,9 @@ function Home() {
             onKeyDown={handleKeyDown}
             aria-label="Search city"
           />
-          <button className="btn btn-primary" onClick={getWeather} aria-label="Get weather">Get Weather</button>
+          <button className="btn btn-primary" onClick={getWeather} aria-label="Get weather">
+            Get Weather
+          </button>
         </div>
 
         {filtered.length > 0 && (

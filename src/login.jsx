@@ -1,25 +1,26 @@
-import { useState, useContext } from "react";
-import { DataStoreContext } from "./data_store";
+import { useState } from "react";
+import { useDataStore } from "./data_store";
 import { Link, useNavigate } from "react-router-dom";
 import Nav from "./nav";
 import Footer from "./footer";
 
 function Login() {
-  const { loginUser, log_user, setLog_user } = useContext(DataStoreContext);
+  const { loginUser, loginMessage, clearLoginMessage } = useDataStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
+    clearLoginMessage();
+    setLoading(true);
 
-    if (email === "" || password === "") {
-      setLog_user("Please fill in all fields");
-    } else {
-      loginUser(email, password);
-      setTimeout(() => {
-        navigate("/home");
-      }, 600);
+    const success = await loginUser(email, password);
+
+    setLoading(false);
+    if (success) {
+      navigate("/home");
     }
   }
 
@@ -41,7 +42,7 @@ function Login() {
                 type="email"
                 placeholder="Enter email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -54,18 +55,22 @@ function Login() {
                 type="password"
                 placeholder="Enter password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            <button type="submit" className="btn btn-primary">Login</button>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
           </form>
         </section>
 
-        <section className="message">
-          <p className="status">{log_user}</p>
-        </section>
+        {loginMessage && (
+          <section className="message">
+            <p className="status">{loginMessage}</p>
+          </section>
+        )}
 
         <p className="alt-link">
           Don't have an account? <Link to="/signup">Signup</Link>

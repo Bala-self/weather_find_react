@@ -1,28 +1,28 @@
-import { useState, useContext } from "react";
-import { DataStoreContext } from "./data_store";
+import { useState } from "react";
+import { useDataStore } from "./data_store"; 
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "./footer";
 import Nav from "./nav";
+import Footer from "./footer";
 
 function Signup() {
-  const { signupUser, signup_user, setSignup_user } = useContext(DataStoreContext);
+  const { signupUser, signupMessage, clearSignupMessage } = useDataStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  function handleSignup(e) {
+  async function handleSignup(e) {
     e.preventDefault();
+    clearSignupMessage();
+    setLoading(true);
 
-    if (!name || !email || !password) {
-      setSignup_user("Please fill in all fields");
-      return;
-    }
+    const success = await signupUser(name, email, password);
 
-    signupUser(name, email, password);
-    setTimeout(() => {
+    setLoading(false);
+    if (success) {
       navigate("/");
-    }, 700);
+    }
   }
 
   return (
@@ -43,7 +43,7 @@ function Signup() {
                 type="text"
                 placeholder="Enter name"
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -56,7 +56,7 @@ function Signup() {
                 type="email"
                 placeholder="Enter email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -69,18 +69,22 @@ function Signup() {
                 type="password"
                 placeholder="Enter password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            <button type="submit" className="btn btn-primary">Signup</button>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? "Creating account..." : "Signup"}
+            </button>
           </form>
         </section>
 
-        <section className="message">
-          <p className="status">{signup_user}</p>
-        </section>
+        {signupMessage && (
+          <section className="message">
+            <p className="status">{signupMessage}</p>
+          </section>
+        )}
 
         <p className="alt-link">
           Already have an account? <Link to="/">Login</Link>

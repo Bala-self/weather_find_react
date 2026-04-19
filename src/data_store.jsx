@@ -1,45 +1,81 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 
- const DataStoreContext = createContext();
+export const DataStoreContext = createContext();
 
 export function DataStoreProvider({ children }) {
-  const [signup_user, setSignup_user] = useState("");
-  const [log_user, setLog_user] = useState("");
+  const [registeredUsers, setRegisteredUsers] = useState([]);
   const [user, setUser] = useState(null);
+  const [signupMessage, setSignupMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
 
   function signupUser(name, email, password) {
-    setTimeout(() => {
-      setUser({ name, email ,password });
-      setSignup_user("Signup successful. You can now login.");
-    }, 600);
+    return new Promise((resolve) => {
+      const exists = registeredUsers.some((u) => u.email === email);
+      if (exists) {
+        setSignupMessage("An account with this email already exists.");
+        return resolve(false);
+      }
+      setTimeout(() => {
+        setRegisteredUsers((prev) => [...prev, { name, email, password }]);
+        setSignupMessage("Signup successful. You can now log in.");
+        resolve(true);
+      }, 600);
+    });
   }
 
   function loginUser(email, password) {
-    setTimeout(() => {
-      if (email && password) {
-        setUser({ name: "User", email });
-        setLog_user("Login successful.");
-      } else {
-        setLog_user("Invalid credentials.");
-      }
-    }, 400);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const match = registeredUsers.find(
+          (u) => u.email === email && u.password === password
+        );
+        if (match) {
+          setUser({ name: match.name, email: match.email });
+          setLoginMessage("Login successful.");
+          resolve(true);
+        } else {
+          setLoginMessage("Invalid email or password.");
+          resolve(false);
+        }
+      }, 400);
+    });
+  }
+
+  function logoutUser() {
+    setUser(null);
+    setLoginMessage("");
+  }
+
+  function clearSignupMessage() {
+    setSignupMessage("");
+  }
+
+  function clearLoginMessage() {
+    setLoginMessage("");
   }
 
   return (
     <DataStoreContext.Provider
       value={{
-        signupUser,
-        signup_user,
-        setSignup_user,
-        loginUser,
-        log_user,
-        setLog_user,
         user,
-        setUser
+        signupMessage,
+        loginMessage,
+        signupUser,
+        loginUser,
+        logoutUser,
+        clearSignupMessage,
+        clearLoginMessage,
       }}
     >
       {children}
     </DataStoreContext.Provider>
   );
 }
-export { DataStoreContext }
+
+// Custom hook for cleaner imports
+export function useDataStore() {
+  const context = useContext(DataStoreContext);
+  if (!context)
+    throw new Error("useDataStore must be used within a DataStoreProvider");
+  return context;
+}
